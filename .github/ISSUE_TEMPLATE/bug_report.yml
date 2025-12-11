@@ -2,7 +2,7 @@ name: 🐞 Bug 报告
 description: 提交一个 Bug 以帮助我们改进
 title: "[Bug] "
 labels: [bug]
-assignees: [xiaobaimc]
+assignees: [xleave]
 body:
   - type: textarea
     id: description

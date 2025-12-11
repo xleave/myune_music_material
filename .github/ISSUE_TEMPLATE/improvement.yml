@@ -2,7 +2,7 @@ name: 🛠 改进 / 优化 / 其他事项
 description: 提出性能优化、流程改进、文档更新或其他杂项建议
 title: "[Improvement] "
 labels: [improvement]
-assignees: [xiaobaimc] 
+assignees: [xleave] 
 body:
   - type: textarea
     id: context

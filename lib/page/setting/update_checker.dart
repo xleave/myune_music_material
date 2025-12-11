@@ -29,8 +29,8 @@ class UpdateCheckResult {
 }
 
 class UpdateChecker {
-  static const String _repoOwner = 'xiaobaimc';
-  static const String _repoName = 'myune_music';
+  static const String _repoOwner = 'xleave';
+  static const String _repoName = 'myune_music_material';
   static const String _apiUrl =
       'https://api.github.com/repos/$_repoOwner/$_repoName/releases/latest';
 

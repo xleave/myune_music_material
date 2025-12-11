@@ -70,7 +70,7 @@ class About extends StatelessWidget {
                         linkTextSpan(
                           context,
                           'GitHub',
-                          'https://github.com/xiaobaimc/myune_music',
+                          'https://github.com/xleave/myune_music_material',
                         ),
                         const TextSpan(
                           text: ' 查看代码',
@@ -90,7 +90,7 @@ class About extends StatelessWidget {
                         linkTextSpan(
                           context,
                           'GitHub Issue',
-                          'https://github.com/xiaobaimc/myune_music/issues',
+                          'https://github.com/xleave/myune_music_material/issues',
                         ),
                         const TextSpan(
                           text: ' 反馈',

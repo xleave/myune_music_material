@@ -2,7 +2,7 @@ name: 💡 功能请求
 description: 提出一个新功能或改进的想法
 title: "[Feature] "
 labels: [enhancement]
-assignees: [xiaobaimc]
+assignees: [xleave]
 body:
   - type: textarea
     id: summary
