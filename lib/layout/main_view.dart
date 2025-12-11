@@ -42,14 +42,9 @@ class _MainViewState extends State<MainView> {
   bool _hasUserToggled = false;
   bool _isExpanded = true;
 
-  final int _tappedIndex = -1;
+  // final int _tappedIndex = -1;
 
   late final List<PageEntry> _entries;
-
-  final TextStyle _mainViewTextStyle = const TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w400,
-  );
 
   // 加载保存的展开状态
   Future<void> _loadExpandedState() async {
@@ -127,30 +122,75 @@ class _MainViewState extends State<MainView> {
     ];
   }
 
-  NavigationRailDestination _buildDest(PageEntry entry, int index) {
-    return NavigationRailDestination(
-      icon: AnimatedScale(
-        scale: _tappedIndex == index ? 1.1 : 1.0,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeInOut,
-        child: Tooltip(
-          message: entry.label,
-          child: Icon(
-            entry.icon,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+  Widget _buildSidebarItem({
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+    required bool isSelected,
+    required bool isExtended,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // 使用 secondaryContainer 作为选中背景，符合 M3 NavigationDrawer 规范
+    final backgroundColor = isSelected
+        ? colorScheme.secondaryContainer
+        : Colors.transparent;
+
+    final foregroundColor = isSelected
+        ? colorScheme.onSecondaryContainer
+        : colorScheme.onSurfaceVariant;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12), // M3 风格圆角
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 只有当空间足够时才显示文本，避免动画过程中的溢出
+              // 需要空间: Padding(32) + Icon(24) + Gap(12) = 68
+              final showText = isExtended && constraints.maxWidth > 68;
+
+              return Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  // 始终居左，因为在折叠状态下(宽80-24=56)，Padding(16)恰好让Icon(24)居中
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      isSelected ? selectedIcon : icon,
+                      color: foregroundColor,
+                      size: 24,
+                    ),
+                    if (showText) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            color: foregroundColor,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
-      selectedIcon: AnimatedScale(
-        scale: _currentIndex == index ? 1.1 : 1.0,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeInOut,
-        child: Icon(
-          entry.selectedIcon,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-      label: Text(entry.label, style: _mainViewTextStyle),
     );
   }
 
@@ -194,103 +234,61 @@ class _MainViewState extends State<MainView> {
                   color: Theme.of(context).colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(24),
                   clipBehavior: Clip.antiAlias,
-                  child: NavigationRail(
-                    backgroundColor: Colors.transparent,
-                    extended: actualExtended,
-                    minExtendedWidth: 180,
-                    selectedIndex: _currentIndex,
-                    leading: null,
-                    onDestinationSelected: (int index) {
-                      switch (visibleEntries[index].page.runtimeType) {
-                        case Playlist _:
-                          playlistNotifier.clearActiveDetailView();
-                          break;
-                        case AllSongs _:
-                          playlistNotifier.setActiveAllSongsView();
-                          break;
-                      }
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                    destinations: [
-                      for (int i = 0; i < visibleEntries.length; i++)
-                        _buildDest(visibleEntries[i], i),
-                    ],
-                    // 在竖屏状态下隐藏折叠按钮
-                    trailing: isPortrait
-                        ? null
-                        : Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 16,
-                                    left: 4,
-                                    right: 4,
-                                  ),
-                                  child: actualExtended
-                                      ? InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          onTap: () {
-                                            final newState = !actualExtended;
-                                            setState(() {
-                                              _isManuallyExpanded = newState;
-                                              _hasUserToggled = true;
-                                            });
-                                            _saveExpandedState(newState);
-                                          },
-                                          child: Container(
-                                            height: 48,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.menu_open,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Text(
-                                                  '收起',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurfaceVariant,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      : IconButton(
-                                          icon: Icon(
-                                            Icons.menu,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                          onPressed: () {
-                                            final newState = !actualExtended;
-                                            setState(() {
-                                              _isManuallyExpanded = newState;
-                                              _hasUserToggled = true;
-                                            });
-                                            _saveExpandedState(newState);
-                                          },
-                                        ),
-                                ),
-                              ],
-                            ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: actualExtended ? 200 : 80,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 12), // 顶部间距
+                        // 导航项
+                        ...visibleEntries.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final pageEntry = entry.value;
+                          return _buildSidebarItem(
+                            icon: pageEntry.icon,
+                            selectedIcon: pageEntry.selectedIcon,
+                            label: pageEntry.label,
+                            isSelected: _currentIndex == index,
+                            isExtended: actualExtended,
+                            onTap: () {
+                              switch (pageEntry.page.runtimeType) {
+                                case Playlist _:
+                                  playlistNotifier.clearActiveDetailView();
+                                  break;
+                                case AllSongs _:
+                                  playlistNotifier.setActiveAllSongsView();
+                                  break;
+                              }
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                          );
+                        }),
+                        const Spacer(),
+                        // 收起/展开按钮
+                        if (!isPortrait) ...[
+                          _buildSidebarItem(
+                            icon: actualExtended ? Icons.menu_open : Icons.menu,
+                            selectedIcon: actualExtended
+                                ? Icons.menu_open
+                                : Icons.menu,
+                            label: '收起',
+                            isSelected: false,
+                            isExtended: actualExtended,
+                            onTap: () {
+                              final newState = !actualExtended;
+                              setState(() {
+                                _isManuallyExpanded = newState;
+                                _hasUserToggled = true;
+                              });
+                              _saveExpandedState(newState);
+                            },
                           ),
+                          const SizedBox(height: 12), // 底部间距
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),
