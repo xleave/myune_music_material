@@ -191,34 +191,15 @@ class _MainViewState extends State<MainView> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 0, 12),
                 child: Material(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(24),
                   clipBehavior: Clip.antiAlias,
                   child: NavigationRail(
                     backgroundColor: Colors.transparent,
                     extended: actualExtended,
+                    minExtendedWidth: 180,
                     selectedIndex: _currentIndex,
-                    leading: isPortrait
-                        ? null
-                        : Column(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  actualExtended ? Icons.menu_open : Icons.menu,
-                                ),
-                                onPressed: () {
-                                  final newState = !actualExtended;
-                                  setState(() {
-                                    _isManuallyExpanded = newState;
-                                    _hasUserToggled = true;
-                                  });
-                                  // 保存状态
-                                  _saveExpandedState(newState);
-                                },
-                              ),
-                              const SizedBox(height: 8),
-                            ],
-                          ),
+                    leading: null,
                     onDestinationSelected: (int index) {
                       switch (visibleEntries[index].page.runtimeType) {
                         case Playlist _:
@@ -237,7 +218,79 @@ class _MainViewState extends State<MainView> {
                         _buildDest(visibleEntries[i], i),
                     ],
                     // 在竖屏状态下隐藏折叠按钮
-                    trailing: null,
+                    trailing: isPortrait
+                        ? null
+                        : Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 16,
+                                    left: 4,
+                                    right: 4,
+                                  ),
+                                  child: actualExtended
+                                      ? InkWell(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          onTap: () {
+                                            final newState = !actualExtended;
+                                            setState(() {
+                                              _isManuallyExpanded = newState;
+                                              _hasUserToggled = true;
+                                            });
+                                            _saveExpandedState(newState);
+                                          },
+                                          child: Container(
+                                            height: 48,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.menu_open,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  '收起',
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      : IconButton(
+                                          icon: Icon(
+                                            Icons.menu,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                          onPressed: () {
+                                            final newState = !actualExtended;
+                                            setState(() {
+                                              _isManuallyExpanded = newState;
+                                              _hasUserToggled = true;
+                                            });
+                                            _saveExpandedState(newState);
+                                          },
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
                   ),
                 ),
               ),

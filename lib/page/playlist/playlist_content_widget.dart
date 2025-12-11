@@ -25,13 +25,14 @@ class PlaylistContentWidget extends StatelessWidget {
         children: [
           // 竖屏时隐藏歌单列表
           if (!isPortrait) ...[
-            const SizedBox(width: 150, child: PlaylistListWidget()),
-            VerticalDivider(
-              width: 1,
-              thickness: 1,
-              color: colorScheme.outlineVariant,
-              indent: 0,
-              endIndent: 0,
+            Container(
+              width: 180,
+              margin: const EdgeInsets.fromLTRB(12, 12, 0, 12),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerLow.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const PlaylistListWidget(),
             ),
           ],
           const Expanded(child: HeadSongListWidget()),
@@ -374,12 +375,21 @@ class PlaylistListWidget extends StatelessWidget {
 
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton.icon(
-            onPressed: () => _showAddPlaylistDialog(context, notifier),
-            icon: const Icon(Icons.add_circle_outline),
-            label: const Text('添加歌单'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton.tonalIcon(
+              onPressed: () => _showAddPlaylistDialog(context, notifier),
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: const Text('添加歌单'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
           ),
         ),
         Expanded(
@@ -390,6 +400,7 @@ class PlaylistListWidget extends StatelessWidget {
               final (playlists, selectedIndex) = data;
 
               return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 itemCount: playlists.length,
                 itemBuilder: (context, index) {
                   final playlist = playlists[index];
@@ -584,43 +595,52 @@ class _PlaylistTileWidgetState extends State<PlaylistTileWidget> {
     final notifier = context.read<PlaylistContentNotifier>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: Material(
-        color: widget.isSelected
-            ? colorScheme.primary.withValues(alpha: 0.1)
-            : _isHovered
-            ? Colors.grey.withValues(alpha: 0.1)
-            : Colors.transparent,
-        child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
           onTap: () => notifier.setSelectedIndex(widget.index),
           onSecondaryTapDown: (details) {
             widget.onSecondaryTap(details.globalPosition);
           },
-          child: ListTile(
-            title: Row(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: widget.isSelected
+                  ? colorScheme.secondaryContainer
+                  : _isHovered
+                  ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
               children: [
                 Expanded(
-                  child: AnimatedScale(
-                    duration: const Duration(milliseconds: 200),
-                    scale: widget.isSelected ? 1.05 : 1.0,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      widget.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: widget.isSelected ? colorScheme.primary : null,
-                      ),
+                  child: Text(
+                    widget.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: widget.isSelected
+                          ? colorScheme.onSecondaryContainer
+                          : colorScheme.onSurface,
+                      fontWeight: widget.isSelected ? FontWeight.bold : null,
                     ),
                   ),
                 ),
                 if (widget.isFolderBased)
-                  const Icon(Icons.folder, size: 16, color: Colors.grey),
+                  Icon(
+                    Icons.folder,
+                    size: 16,
+                    color: widget.isSelected
+                        ? colorScheme.onSecondaryContainer
+                        : colorScheme.outline,
+                  ),
               ],
             ),
-            selected: widget.isSelected,
           ),
         ),
       ),
