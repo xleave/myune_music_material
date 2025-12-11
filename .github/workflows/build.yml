@@ -1,0 +1,84 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master", "main", "dev" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+      - name: Build Windows Release
+        run: flutter build windows --release
+      - name: Compile Installer (Inno Setup)
+        uses: Minionguyjosh/inno-setup-action@v1.2.2
+        with:
+          path: build_setup.iss
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: output_setup/*.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev
+      - name: Enable Linux Desktop
+        run: flutter config --enable-linux-desktop
+      - name: Build Linux Release
+        run: flutter build linux --release
+      - name: Create Tarball
+        run: |
+          cd build/linux/x64/release/bundle
+          tar -czvf ../../../../../myune_music_linux.tar.gz .
+      - name: Upload Tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-tar
+          path: myune_music_linux.tar.gz
+      - name: Install FPM
+        run: sudo gem install fpm
+      - name: Build RPM
+        run: |
+          fpm -s dir -t rpm \
+            -n myune-music \
+            -v 0.8.0 \
+            -C build/linux/x64/release/bundle \
+            --prefix /opt/myune-music \
+            --description "A music player built with Flutter." \
+            --url "https://github.com/xleave/myune_music_material" \
+            --license "Apache-2.0" \
+            .
+      - name: Upload RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-rpm
+          path: "*.rpm"
