@@ -14,7 +14,7 @@ UninstallDisplayName=MyuneMusic
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "chinese"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "chinese"; MessagesFile: "ChineseSimplified.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
