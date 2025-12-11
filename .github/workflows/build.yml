@@ -15,11 +15,9 @@ jobs:
         with:
           channel: 'stable'
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          profile: minimal
-          override: true
       - name: Enable Windows Desktop
         run: flutter config --enable-windows-desktop
       - name: Build Windows Release
@@ -42,11 +40,9 @@ jobs:
         with:
           channel: 'stable'
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          profile: minimal
-          override: true
       - name: Install Dependencies
         run: |
           sudo apt-get update
