@@ -104,23 +104,75 @@ class PlaylistListWidget extends StatelessWidget {
                     ),
                     if (selectedMode == ManagementMode.folder) ...[
                       const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final folder = await FilePicker.platform
-                              .getDirectoryPath(
-                                dialogTitle: '请选择文件夹',
-                                lockParentWindow: true,
-                              );
-                          if (folder != null) {
-                            setState(() {
-                              if (!selectedFolders.contains(folder)) {
-                                selectedFolders.add(folder);
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final folder = await FilePicker.platform
+                                  .getDirectoryPath(
+                                    dialogTitle: '请选择文件夹',
+                                    lockParentWindow: true,
+                                  );
+                              if (folder != null) {
+                                setState(() {
+                                  if (!selectedFolders.contains(folder)) {
+                                    selectedFolders.add(folder);
+                                  }
+                                });
                               }
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.folder_open),
-                        label: const Text('添加文件夹'),
+                            },
+                            icon: const Icon(Icons.folder_open),
+                            label: const Text('添加文件夹'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final controller = TextEditingController();
+                              final folder = await showDialog<String>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('输入文件夹路径'),
+                                  content: TextField(
+                                    controller: controller,
+                                    decoration: const InputDecoration(
+                                      labelText: '文件夹路径',
+                                      hintText: '请输入绝对路径',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    autofocus: true,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('取消'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        if (controller.text.isNotEmpty) {
+                                          Navigator.pop(
+                                            context,
+                                            controller.text,
+                                          );
+                                        }
+                                      },
+                                      child: const Text('确定'),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (folder != null && folder.isNotEmpty) {
+                                setState(() {
+                                  if (!selectedFolders.contains(folder)) {
+                                    selectedFolders.add(folder);
+                                  }
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.input),
+                            label: const Text('输入路径'),
+                          ),
+                        ],
                       ),
                       if (selectedFolders.isNotEmpty) ...[
                         const SizedBox(height: 8),
@@ -400,6 +452,51 @@ class PlaylistListWidget extends StatelessWidget {
                       },
                       icon: const Icon(Icons.folder_open),
                       label: const Text('添加文件夹'),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final controller = TextEditingController();
+                        final folder = await showDialog<String>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('输入文件夹路径'),
+                            content: TextField(
+                              controller: controller,
+                              decoration: const InputDecoration(
+                                labelText: '文件夹路径',
+                                hintText: '请输入绝对路径',
+                                border: OutlineInputBorder(),
+                              ),
+                              autofocus: true,
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('取消'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  if (controller.text.isNotEmpty) {
+                                    Navigator.pop(context, controller.text);
+                                  }
+                                },
+                                child: const Text('确定'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (folder != null && folder.isNotEmpty) {
+                          setState(() {
+                            if (!selectedFolders.contains(folder)) {
+                              selectedFolders.add(folder);
+                            }
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.input),
+                      label: const Text('输入路径'),
                     ),
                     if (selectedFolders.isNotEmpty) ...[
                       const SizedBox(height: 8),
@@ -1079,7 +1176,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                 _showSongContextMenu(details.globalPosition, notifier);
               }
             },
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
 
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
@@ -1089,7 +1186,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                     : isPlaying
                     ? colorScheme.primary.withValues(alpha: 0.1)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
                 leading: SizedBox(
@@ -1097,7 +1194,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                   height: 50,
                   child: widget.song.albumArt != null
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                           child: Image.memory(
                             widget.song.albumArt!,
                             fit: BoxFit.cover,

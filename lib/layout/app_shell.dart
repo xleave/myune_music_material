@@ -104,10 +104,10 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.transparent,
-      endDrawer: PlayingQueueDrawer(),
-      body: Material(
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      endDrawer: const PlayingQueueDrawer(),
+      body: const Material(
         color: Colors.transparent,
         child: Column(
           children: [

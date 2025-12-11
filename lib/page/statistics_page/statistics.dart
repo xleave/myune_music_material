@@ -417,11 +417,11 @@ class _StatisticsState extends State<Statistics> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: cover != null
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(8),
                         child: Image.memory(
                           cover,
                           width: 40,

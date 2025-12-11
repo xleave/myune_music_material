@@ -188,74 +188,70 @@ class _MainViewState extends State<MainView> {
         return Row(
           children: [
             SafeArea(
-              child: NavigationRail(
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.surfaceContainerHighest,
-                extended: actualExtended,
-                selectedIndex: _currentIndex,
-                onDestinationSelected: (int index) {
-                  switch (visibleEntries[index].page.runtimeType) {
-                    case Playlist _:
-                      playlistNotifier.clearActiveDetailView();
-                      break;
-                    case AllSongs _:
-                      playlistNotifier.setActiveAllSongsView();
-                      break;
-                  }
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                destinations: [
-                  for (int i = 0; i < visibleEntries.length; i++)
-                    _buildDest(visibleEntries[i], i),
-                ],
-                // 在竖屏状态下隐藏折叠按钮
-                trailing: isPortrait
-                    ? null
-                    : Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 8,
-                                bottom: 16,
-                              ),
-                              child: CircleAvatar(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.1),
-                                child: IconButton(
-                                  icon: Icon(
-                                    actualExtended
-                                        ? Icons.arrow_back_ios_new
-                                        : Icons.arrow_forward_ios,
-                                  ),
-                                  onPressed: () {
-                                    final newState = !actualExtended;
-                                    setState(() {
-                                      _isManuallyExpanded = newState;
-                                      _hasUserToggled = true;
-                                    });
-                                    // 保存状态
-                                    _saveExpandedState(newState);
-                                  },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 0, 12),
+                child: Material(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(24),
+                  clipBehavior: Clip.antiAlias,
+                  child: NavigationRail(
+                    backgroundColor: Colors.transparent,
+                    extended: actualExtended,
+                    selectedIndex: _currentIndex,
+                    leading: isPortrait
+                        ? null
+                        : Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  actualExtended ? Icons.menu_open : Icons.menu,
                                 ),
+                                onPressed: () {
+                                  final newState = !actualExtended;
+                                  setState(() {
+                                    _isManuallyExpanded = newState;
+                                    _hasUserToggled = true;
+                                  });
+                                  // 保存状态
+                                  _saveExpandedState(newState);
+                                },
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                    onDestinationSelected: (int index) {
+                      switch (visibleEntries[index].page.runtimeType) {
+                        case Playlist _:
+                          playlistNotifier.clearActiveDetailView();
+                          break;
+                        case AllSongs _:
+                          playlistNotifier.setActiveAllSongsView();
+                          break;
+                      }
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    destinations: [
+                      for (int i = 0; i < visibleEntries.length; i++)
+                        _buildDest(visibleEntries[i], i),
+                    ],
+                    // 在竖屏状态下隐藏折叠按钮
+                    trailing: null,
+                  ),
+                ),
               ),
             ),
             Expanded(
-              child: visibleEntries.isNotEmpty
-                  ? visibleEntries[_currentIndex]
-                        .page // 动态展示页面
-                  : const SizedBox.shrink(),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: visibleEntries.isNotEmpty
+                      ? visibleEntries[_currentIndex].page
+                      : const SizedBox.shrink(),
+                ),
+              ),
             ),
           ],
         );
