@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ "master", "main", "dev", "dev-settings-update" ]
+    branches: [ "master", "main", "dev" ]
   pull_request:
     branches: [ "master", "main" ]
 
@@ -22,10 +22,10 @@ jobs:
         run: flutter config --enable-windows-desktop
       - name: Build Windows Release
         run: flutter build windows --release
+      - name: Install Inno Setup
+        run: choco install innosetup
       - name: Compile Installer (Inno Setup)
-        uses: Minionguyjosh/inno-setup-action@v1.2.2
-        with:
-          path: build_setup.iss
+        run: iscc build_setup.iss
       - name: Upload Installer
         uses: actions/upload-artifact@v4
         with:
@@ -46,7 +46,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev libayatana-appindicator3-dev
       - name: Enable Linux Desktop
         run: flutter config --enable-linux-desktop
       - name: Build Linux Release
