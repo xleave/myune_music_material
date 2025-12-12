@@ -34,6 +34,7 @@ output_setup/
 .pub-cache/
 .pub/
 /build/
+rust_builder/
 
 # Symbolication related
 app.*.symbols
