@@ -64,11 +64,29 @@ jobs:
         run: sudo gem install fpm
       - name: Build RPM
         run: |
+          # Prepare staging directory
+          mkdir -p pkg_root/opt/myune-music
+          mkdir -p pkg_root/usr/bin
+          mkdir -p pkg_root/usr/share/applications
+          mkdir -p pkg_root/usr/share/icons/hicolor/256x256/apps
+          
+          # Copy application files
+          cp -r build/linux/x64/release/bundle/* pkg_root/opt/myune-music/
+          
+          # Create symlink in /usr/bin
+          ln -s /opt/myune-music/myune_music pkg_root/usr/bin/myune-music
+          
+          # Copy desktop file
+          cp linux/packaging/myune-music.desktop pkg_root/usr/share/applications/
+          
+          # Copy icon (assuming icon exists at assets/images/icon/icon.png)
+          cp assets/images/icon/icon.png pkg_root/usr/share/icons/hicolor/256x256/apps/myune-music.png
+          
+          # Build RPM
           fpm -s dir -t rpm \
             -n myune-music \
             -v 0.8.0 \
-            -C build/linux/x64/release/bundle \
-            --prefix /opt/myune-music \
+            -C pkg_root \
             --description "A music player built with Flutter." \
             --url "https://github.com/xleave/myune_music_material" \
             --license "Apache-2.0" \

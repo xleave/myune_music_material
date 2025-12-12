@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Myune Music
+Comment=A music player built with Flutter
+Exec=/opt/myune-music/myune_music
+Icon=myune-music
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Player;
+Keywords=flutter;music;player;
+StartupWMClass=myune_music
